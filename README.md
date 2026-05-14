@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10+"/>
   <img src="https://img.shields.io/badge/built%20with-copilot-blueviolet?style=for-the-badge&logo=github&logoColor=white" alt="Built with Copilot"/>
   <img src="https://img.shields.io/badge/ui-rich%20%7C%20pyfiglet-cyan?style=for-the-badge" alt="Rich + Pyfiglet"/>
+  <img src="https://img.shields.io/badge/tests-102%20passed-brightgreen?style=for-the-badge&logo=pytest&logoColor=white" alt="102 Tests Passed"/>
   <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="MIT License"/>
 </p>
 
@@ -38,6 +39,7 @@
 - [Extending the Game](#-extending-the-game)
   - [Adding New Story Nodes](#adding-new-story-nodes)
   - [Customizing the UI](#customizing-the-ui)
+- [Testing](#-testing)
 - [Dependencies](#-dependencies)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -178,7 +180,8 @@ copilot_skills/
 │
 ├── adventure_game/              # Main game package
 │   ├── main.py                  # 🚀 Entry point — initializes and runs the game
-│   ├── requirements.txt         # Python dependencies
+│   ├── requirements.txt         # Python dependencies (includes pytest)
+│   ├── pytest.ini               # Pytest configuration
 │   │
 │   ├── game/                    # 🎮 Game logic layer
 │   │   ├── __init__.py
@@ -187,14 +190,22 @@ copilot_skills/
 │   │
 │   ├── story/                   # 📜 Story data layer
 │   │   ├── __init__.py
-│   │   └── nodes.py             # Declarative story graph (10 nodes, 3 endings)
+│   │   └── nodes.py             # Declarative story graph (11 nodes, 3 endings)
 │   │
-│   └── ui/                      # 🎨 Presentation layer
+│   ├── ui/                      # 🎨 Presentation layer
+│   │   ├── __init__.py
+│   │   ├── display.py           # Rich-powered terminal renderer
+│   │   └── flowchart.py         # ASCII flowchart progress visualizer
+│   │
+│   └── tests/                   # 🧪 Automated test suite (102 tests)
 │       ├── __init__.py
-│       ├── display.py           # Rich-powered terminal renderer
-│       └── flowchart.py         # ASCII flowchart progress visualizer
+│       ├── test_player.py       # Player class unit tests (25 tests)
+│       ├── test_engine.py       # GameEngine unit + integration tests (17 tests)
+│       ├── test_story_nodes.py  # Story graph integrity tests (25 tests)
+│       └── test_ui.py           # UI renderer + flowchart tests (35 tests)
 │
 ├── .gitattributes               # Git line-ending normalization
+├── .gitignore                   # Ignored files (pycache, venvs, IDEs)
 └── README.md                    # 📖 This file
 ```
 
@@ -430,6 +441,46 @@ self.layout = [
 
 ---
 
+## 🧪 Testing
+
+The project includes a comprehensive automated test suite with **102 tests** covering all modules.
+
+### Running Tests
+
+```bash
+cd adventure_game
+python -m pytest tests/ -v
+```
+
+### Test Coverage Breakdown
+
+| Test File | Module Tested | Tests | Coverage Areas |
+|---|---|---|---|
+| `test_player.py` | `game/player.py` | 25 | Init, inventory CRUD, health damage/heal clamping, score, status display |
+| `test_engine.py` | `game/engine.py` | 17 | Init, rendering, choice execution, item gates, fallbacks, full game runs |
+| `test_story_nodes.py` | `story/nodes.py` | 25 | Node structure, choice validation, graph topology, reachability analysis |
+| `test_ui.py` | `ui/display.py` + `ui/flowchart.py` | 35 | Flowchart rendering, health bar colors, score panel, render methods |
+
+### Test Categories
+
+- **Unit Tests** — Isolated tests for `Player`, `FlowchartVisualizer`, and `UIRenderer` methods
+- **Integration Tests** — Full game runs through win, stealth, and burnout paths using mocked I/O
+- **Data Integrity Tests** — Validates the story graph: all nodes reachable, all paths lead to endings, no broken references
+- **Edge Cases** — Zero health, max healing, empty inventory, invalid choices, missing required items
+
+### Example Output
+
+```
+tests/test_player.py::TestInventory::test_add_item_stacks PASSED         [ 26%]
+tests/test_engine.py::TestGameRun::test_fastest_win_path PASSED          [ 14%]
+tests/test_story_nodes.py::TestReachability::test_all_nodes_reachable_from_start PASSED [ 72%]
+tests/test_ui.py::TestUIRendererHealthBar::test_health_bar_red_at_zero PASSED  [ 86%]
+
+============================= 102 passed in 0.30s =============================
+```
+
+---
+
 ## 📦 Dependencies
 
 | Package | Version | Purpose |
@@ -437,6 +488,7 @@ self.layout = [
 | [rich](https://github.com/Textualize/rich) | Latest | Terminal UI rendering (panels, tables, progress bars, styled text) |
 | [pyfiglet](https://github.com/pwaller/pyfiglet) | Latest | ASCII art title text generation |
 | [colorama](https://github.com/tartley/colorama) | Latest | Cross-platform ANSI color support (Windows compatibility) |
+| [pytest](https://github.com/pytest-dev/pytest) | Latest | Automated testing framework |
 
 Install all dependencies:
 ```bash
@@ -461,7 +513,7 @@ Contributions are welcome! Here's how to get started:
 - 💾 Save/load game state
 - 🏆 Achievements system
 - 🎵 Terminal-based sound effects
-- 🧪 Unit tests for game engine
+- 🧪 Additional edge-case tests and fuzzing
 
 ---
 
